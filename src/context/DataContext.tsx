@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
 import {
   Course,
   ServiceItem,
@@ -233,6 +234,39 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => { localStorage.setItem('tetra_certificates', JSON.stringify(certificates)); }, [certificates]);
   useEffect(() => { localStorage.setItem('tetra_submissions', JSON.stringify(submissions)); }, [submissions]);
 
+  // Sync with Supabase when configured
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const fetchSupabaseData = async () => {
+      try {
+        const { data: remoteCourses } = await supabase.from('courses').select('*');
+        if (remoteCourses && remoteCourses.length > 0) {
+          setCourses(remoteCourses as any);
+        }
+
+        const { data: remoteServices } = await supabase.from('services').select('*');
+        if (remoteServices && remoteServices.length > 0) {
+          setServices(remoteServices as any);
+        }
+
+        const { data: remoteTrainers } = await supabase.from('trainers').select('*');
+        if (remoteTrainers && remoteTrainers.length > 0) {
+          setTrainers(remoteTrainers as any);
+        }
+
+        const { data: remoteTestimonials } = await supabase.from('testimonials').select('*');
+        if (remoteTestimonials && remoteTestimonials.length > 0) {
+          setTestimonials(remoteTestimonials as any);
+        }
+      } catch (err) {
+        console.warn('Supabase fetch notice: using local fallback', err);
+      }
+    };
+
+    fetchSupabaseData();
+  }, []);
+
   // Operations
   const updateHeroSlide = (id: string, updates: Partial<HeroSlide>) => {
     setHeroSlides((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
@@ -372,6 +406,24 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString().split('T')[0],
     };
     setInquiries((prev) => [newInquiry, ...prev]);
+
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('service_inquiries').insert([{
+          id: newInquiry.id,
+          name: newInquiry.name,
+          email: newInquiry.email,
+          phone: newInquiry.phone,
+          service_category: newInquiry.serviceCategory,
+          budget: newInquiry.budget,
+          message: newInquiry.message,
+          status: newInquiry.status,
+        }]);
+      } catch (err) {
+        console.warn('Supabase inquiry insert fallback', err);
+      }
+    }
+
     return true;
   };
 
@@ -395,6 +447,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString().split('T')[0],
     };
     setContactMessages((prev) => [newMsg, ...prev]);
+
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('contact_messages').insert([{
+          id: newMsg.id,
+          name: newMsg.name,
+          email: newMsg.email,
+          phone: newMsg.phone,
+          subject: newMsg.subject,
+          message: newMsg.message,
+          status: newMsg.status,
+        }]);
+      } catch (err) {
+        console.warn('Supabase contact insert fallback', err);
+      }
+    }
+
     return true;
   };
 
@@ -411,6 +480,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       subscribedAt: new Date().toISOString().split('T')[0],
     };
     setSubscribers((prev) => [newSub, ...prev]);
+
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('newsletter_subscribers').insert([{
+          id: newSub.id,
+          email: newSub.email,
+        }]);
+      } catch (err) {
+        console.warn('Supabase subscriber insert fallback', err);
+      }
+    }
+
     return { success: true, message: 'Thank you for subscribing! Check your inbox for updates.' };
   };
 
