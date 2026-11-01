@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /trainer/
+Disallow: /student/
+
+Sitemap: https://tetra.com.bd/sitemap.xml

@@ -1,0 +1,133 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+    }
+
+    function isTrainer() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'trainer';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Public website content - Read-only for public, write for Super Admin
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if isSuperAdmin() || (isTrainer() && resource.data.trainerId == request.auth.uid);
+    }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    match /trainers/{trainerId} {
+      allow read: if true;
+      allow write: if isSuperAdmin() || (isTrainer() && trainerId == request.auth.uid);
+    }
+
+    match /testimonials/{testimonialId} {
+      allow read: if resource.data.approved == true || isSuperAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin();
+    }
+
+    match /heroSlides/{slideId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    match /statistics/{statId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    match /websiteSettings/{docId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    match /certificates/{certificateId} {
+      allow read: if true; // Publicly verifiable by certificate ID
+      allow write: if isSuperAdmin() || isTrainer();
+    }
+
+    // User management & profile
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin() || isTrainer());
+      // Prevent user from escalating their own role
+      allow create: if isAuthenticated() && request.auth.uid == userId && request.resource.data.role == 'student';
+      allow update: if isSuperAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role);
+      allow delete: if isSuperAdmin();
+    }
+
+    // Enrollments
+    match /enrollments/{enrollmentId} {
+      allow read: if isSuperAdmin() || 
+        (isAuthenticated() && resource.data.studentId == request.auth.uid) ||
+        isTrainer();
+      allow create: if isAuthenticated() && request.resource.data.studentId == request.auth.uid;
+      allow update: if isSuperAdmin() || (isAuthenticated() && resource.data.studentId == request.auth.uid);
+      allow delete: if isSuperAdmin();
+    }
+
+    // Course modules & lessons
+    match /modules/{moduleId} {
+      allow read: if true;
+      allow write: if isSuperAdmin() || isTrainer();
+    }
+
+    match /lessons/{lessonId} {
+      allow read: if true;
+      allow write: if isSuperAdmin() || isTrainer();
+    }
+
+    // Assignments and Submissions
+    match /assignments/{assignmentId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isTrainer();
+    }
+
+    match /submissions/{submissionId} {
+      allow read: if isSuperAdmin() || isTrainer() || 
+        (isAuthenticated() && resource.data.studentId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.studentId == request.auth.uid;
+      allow update: if isSuperAdmin() || isTrainer(); // Grading
+      allow delete: if isSuperAdmin();
+    }
+
+    // Contact messages & Inquiries from public
+    match /contactMessages/{messageId} {
+      allow create: if true; // Public submission
+      allow read, update, delete: if isSuperAdmin();
+    }
+
+    match /serviceInquiries/{inquiryId} {
+      allow create: if true; // Public inquiry
+      allow read, update, delete: if isSuperAdmin();
+    }
+
+    match /newsletterSubscribers/{subId} {
+      allow create: if true;
+      allow read, delete: if isSuperAdmin();
+    }
+
+    // Activity logs
+    match /activityLogs/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Immutable audit log
+    }
+  }
+}

@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-primary-navy: #071426;
+    --color-secondary-navy: #101C3C;
+    --color-deep-navy: #040B15;
+    --color-primary-blue: #087BFF;
+    --color-electric-blue: #00A9FF;
+    --color-light-bg: #F5F7FC;
+    --color-text-dark: #101A33;
+    --color-muted-text: #68758A;
+  }
+
+  body {
+    font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--color-text-dark);
+    background-color: var(--color-light-bg);
+    overflow-x: hidden;
+  }
+
+  /* Bengali Font Support */
+  .font-bengali {
+    font-family: 'Hind Siliguri', 'Inter', sans-serif;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #071426;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e3a5f;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00A9FF;
+}
+
+/* Glassmorphism and glow utilities */
+.glass-dark {
+  background: rgba(7, 20, 38, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glow-blue {
+  box-shadow: 0 0 25px rgba(0, 169, 255, 0.35);
+}
+
+.glow-subtle {
+  box-shadow: 0 4px 20px rgba(8, 123, 255, 0.12);
+}
+
+/* Shimmer animation for card badges or buttons */
+@keyframes pulseSlow {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 4s ease-in-out infinite;
+}

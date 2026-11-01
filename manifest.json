@@ -1,0 +1,74 @@
+{
+  "manifest_version": 3,
+  "name": "CineForge AI - Cinematic Movie Studio",
+  "version": "1.0.0",
+  "description": "One Script. One World. One Complete Movie. All-in-One AI Cinematic Movie Production Chrome Extension.",
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "CineForge AI",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.google.com/*",
+        "*://*.google/*",
+        "*://*.withgoogle.com/*",
+        "*://labs.google/*",
+        "*://aistudio.google.com/*",
+        "<all_urls>"
+      ],
+      "js": ["flow-content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "activeTab",
+    "downloads",
+    "notifications",
+    "alarms"
+  ],
+  "host_permissions": [
+    "*://*.google.com/*",
+    "*://*.google/*",
+    "*://*.withgoogle.com/*",
+    "*://labs.google/*",
+    "*://aistudio.google.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "<all_urls>"
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "options_ui": {
+    "page": "src/options/settings.html",
+    "open_in_tab": true
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/*",
+        "icons/*",
+        "src/dashboard/dashboard.html",
+        "src/popup/popup.html",
+        "src/options/settings.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

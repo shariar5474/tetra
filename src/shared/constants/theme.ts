@@ -1,0 +1,25 @@
+export const THEME = {
+  colors: {
+    midnightNavy: '#0B0F19',
+    deepBlack: '#05070D',
+    cardNavy: '#0F172A',
+    surfaceNavy: '#131D31',
+    borderNavy: '#1E293B',
+    electricBlue: '#3B82F6',
+    neonPurple: '#8B5CF6',
+    neonCyan: '#06B6D4',
+    cinemaGold: '#F59E0B',
+    dangerRed: '#EF4444',
+    successGreen: '#10B981',
+    textPrimary: '#F8FAFC',
+    textSecondary: '#94A3B8',
+    textMuted: '#64748B',
+  },
+  gradients: {
+    cinemaPrimary: 'from-blue-600 via-indigo-600 to-purple-600',
+    neonGlow: 'from-cyan-500 via-blue-500 to-purple-500',
+    darkGlass: 'bg-slate-900/80 backdrop-blur-md border border-slate-800/80',
+    cardGlass: 'bg-[#0F172A]/90 backdrop-blur-lg border border-slate-800/70 shadow-xl shadow-black/40',
+    highlightGlass: 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30',
+  },
+};
